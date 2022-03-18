@@ -33,11 +33,11 @@ class PropertySetViewController: UIViewController{
     }
     
     private func addNotificationObservers(){
-        NotificationCenter.default.addObserver(self, selector: #selector(changedColorText), name: DrawingViewController.Notification.Event.changedRectangleColor, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(alphaButtonHidden), name: DrawingViewController.Notification.Event.changedAlpha, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateSelectedRectangleUI), name: DrawingViewController.Notification.Event.updateSelectedRectangleUI, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateSelectedPhotoUI), name: DrawingViewController.Notification.Event.updateSelectedPhotoUI, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateDeselectedUI), name: DrawingViewController.Notification.Event.updateDeselectedUI, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changedColorText), name: Plane.Notification.Event.changedRectangleColor, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(alphaButtonHidden), name: Plane.Notification.Event.updateCustomViewAlpha, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateSelectedRectangleUI), name: Plane.Notification.Event.selectedRectangle, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateSelectedPhotoUI), name: Plane.Notification.Event.selectedPhoto, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateDeselectedUI), name: Plane.Notification.Event.deselectedCustomView, object: nil)
     }
     
     @IBAction func colorChangeTapped(_ sender: UIButton) {
@@ -53,17 +53,17 @@ class PropertySetViewController: UIViewController{
     }
     
     @objc private func changedColorText(_ notification: Foundation.Notification){
-        guard let rectangle = notification.userInfo?[DrawingViewController.Notification.Key.rectangle] as? RectangleViewModelMutable else { return }
+        guard let rectangle = notification.userInfo?[Plane.Notification.Key.rectangle] as? RectangleViewModelMutable else { return }
         setColorButtonRGBText(rectangleRGB: rectangle.getColorRGB())
     }
     
     @objc private func alphaButtonHidden(_ notification: Foundation.Notification){
-        guard let customModel = notification.userInfo?[DrawingViewController.Notification.Key.customViewModel] as? CustomViewModelMutable else { return }
+        guard let customModel = notification.userInfo?[Plane.Notification.Key.customViewModel] as? CustomViewModelMutable else { return }
         alphaButtonIsHidden(alpha: customModel.getAlpha())
     }
     
     @objc private func updateSelectedRectangleUI(_ notification: Foundation.Notification){
-        guard let rectangle = notification.userInfo?[DrawingViewController.Notification.Key.rectangle] as? RectangleViewModelMutable else {
+        guard let rectangle = notification.userInfo?[Plane.Notification.Key.rectangle] as? RectangleViewModelMutable else {
             return
         }
         alphaButtonIsHidden(alpha: rectangle.getAlpha())
@@ -72,7 +72,7 @@ class PropertySetViewController: UIViewController{
     }
     
     @objc private func updateSelectedPhotoUI(_ notification: Foundation.Notification){
-        guard let photo = notification.userInfo?[DrawingViewController.Notification.Key.photo] as? PhotoViewModelMutable else {
+        guard let photo = notification.userInfo?[Plane.Notification.Key.photo] as? PhotoViewModelMutable else {
             return
         }
         alphaButtonIsHidden(alpha: photo.getAlpha())

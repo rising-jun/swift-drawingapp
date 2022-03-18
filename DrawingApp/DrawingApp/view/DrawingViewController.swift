@@ -42,19 +42,12 @@ class DrawingViewController: UIViewController{
     }
     
     private func addOutputNotificationObserver(){
-        notificationCenter.addObserver(self, selector: #selector(selectedRectangle), name: Plane.Notification.Event.selectedRectangle, object: plane)
-        notificationCenter.addObserver(self, selector: #selector(selectedPhoto), name: Plane.Notification.Event.selectedPhoto, object: plane)
         notificationCenter.addObserver(self, selector: #selector(rectangleColorChanged), name: Plane.Notification.Event.changedRectangleColor, object: plane)
-        notificationCenter.addObserver(self, selector: #selector(deselectedCustomView), name: Plane.Notification.Event.deselectedCustomView, object: plane)
         notificationCenter.addObserver(self, selector: #selector(customViewAlphaChanged), name: Plane.Notification.Event.updateCustomViewAlpha, object: plane)
     }
     
     @objc private func viewTappedGesture(){
         plane?.deSelectTargetCustomView()
-    }
-    
-    @objc private func deselectedCustomView(_ notification: Foundation.Notification){
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.updateDeselectedUI, object: self)
     }
     
     private func setRectangleButtonEvent(){
@@ -92,17 +85,14 @@ class DrawingViewController: UIViewController{
             customViews[rectangle] = customView
         }
         view.addSubview(customView)
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.updateSelectedRectangleUI, object: self, userInfo: [DrawingViewController.Notification.Key.rectangle : rectangleViewModel])
     }
     
     func setViewAlpha(customView: CustomBaseViewSetable, customViewModel: CustomViewModelMutable){
         customView.setAlpha(alpha: customViewModel.getAlpha())
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.changedAlpha, object: self, userInfo: [DrawingViewController.Notification.Key.customViewModel : customViewModel])
     }
     
     func setRectangleViewColor(customView: RectangleViewSetable, rectangleModel: RectangleViewModelMutable){
         customView.setRGBColor(rgb: rectangleModel.getColorRGB())
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.changedRectangleColor, object: self, userInfo: [DrawingViewController.Notification.Key.rectangle : rectangleModel])
     }
     
     @objc private func addPhotoViewToSubView(_ notification: Foundation.Notification){
@@ -118,7 +108,6 @@ class DrawingViewController: UIViewController{
             customViews[photo] = customView
         }
         view.addSubview(customView)
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.updateSelectedPhotoUI, object: self, userInfo: [DrawingViewController.Notification.Key.photo : photoViewModel])
     }
     
     @objc func rectangleTappedGesture(sender: UITapGestureRecognizer){
@@ -133,20 +122,6 @@ class DrawingViewController: UIViewController{
         plane?.selectTargetCustomView(point: viewPoint)
     }
     
-    @objc private func selectedRectangle(_ notification: Foundation.Notification){
-        guard let rectangleViewModel = notification.userInfo?[Plane.Notification.Key.rectangle] as? RectangleViewModelMutable else {
-            return
-        }
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.updateSelectedRectangleUI, object: self, userInfo: [DrawingViewController.Notification.Key.rectangle : rectangleViewModel])
-    }
-    
-    @objc private func selectedPhoto(_ notification: Foundation.Notification){
-        guard let photoViewModel = notification.userInfo?[Plane.Notification.Key.photo] as? PhotoViewModelMutable else {
-            return
-        }
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.updateSelectedPhotoUI, object: self, userInfo: [DrawingViewController.Notification.Key.photo : photoViewModel])
-    }
-    
     @objc private func rectangleColorChanged(_ notification: Foundation.Notification){
         guard let rectangleViewModel = notification.userInfo?[Plane.Notification.Key.rectangle] as? RectangleViewModelMutable else {
             return
@@ -155,7 +130,6 @@ class DrawingViewController: UIViewController{
             guard let rectangleView = customViews[rectangle] as? RectangleView else { return }
             rectangleView.setRGBColor(rgb: rectangleViewModel.getColorRGB())
         }
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.changedRectangleColor, object: self, userInfo: [DrawingViewController.Notification.Key.rectangle : rectangleViewModel])
     }
     
     @objc private func customViewAlphaChanged(_ notification: Foundation.Notification){
@@ -165,7 +139,6 @@ class DrawingViewController: UIViewController{
         if let customModel = customViewModelMutable as? CustomViewModel{
             customViews[customModel]?.setAlpha(alpha: customViewModelMutable.getAlpha())
         }
-        NotificationCenter.default.post(name: DrawingViewController.Notification.Event.changedAlpha, object: self, userInfo: [DrawingViewController.Notification.Key.customViewModel : customViewModelMutable])
     }
     
     private func plusViewAlpha(){
@@ -185,21 +158,6 @@ class DrawingViewController: UIViewController{
             plusViewAlpha()
         case .alphaMinusTapped:
             minusViewAlpha()
-        }
-    }
-    
-    enum Notification{
-        enum Event{
-            static let changedRectangleColor = Foundation.Notification.Name.init("changedColorText")
-            static let changedAlpha = Foundation.Notification.Name.init("alphaButtonHidden")
-            static let updateSelectedRectangleUI = Foundation.Notification.Name.init("updateSelectedUI")
-            static let updateSelectedPhotoUI = Foundation.Notification.Name.init("updateSelectedPhotoUI")
-            static let updateDeselectedUI = Foundation.Notification.Name.init("updateDeselectedUI")
-        }
-        enum Key{
-            case rectangle
-            case customViewModel
-            case photo
         }
     }
 }
